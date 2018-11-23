@@ -55,11 +55,15 @@ class Preprocessor:
 
             while self.block[1] != 'endif':
                 self.block = next(self._iter_tree)
+                _pos, op, args = self.block
                 _end = self.source.index('\n', end)
-                self.body.write(self.source[_end:self.block[0][0]])
-                pos, op, args = self.block
-                getattr(self, 'op_%s' % op)(pos, *args)
-                start, end = self.block[0]
+
+                self.body.write(self.source[_end:_pos[0]])
+
+                getattr(self, 'op_%s' % op)(_pos, *args)
+
+                start, end = _pos
+                self.write_offset += end - (start + self.source.index('\n', end))
 
         # Skip to the next 'endif'
         while self.block[1] != 'endif':
