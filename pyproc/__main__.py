@@ -11,7 +11,11 @@ def main(args):
     with open(args.file) as inf:
         contents = inf.read()
 
-    pyproc.Preprocessor(contents).process()
+    output_file = args.output_file or '%s_proc.py' % args.file.rsplit('.', 1)[0]
+
+    with open(output_file, 'w') as inf:
+        proc = pyproc.Preprocessor(contents, output=inf)
+        proc.process()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
