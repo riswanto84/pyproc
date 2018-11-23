@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import re
 
 _command_pattern = r'##([a-zA-Z^\w]+)'

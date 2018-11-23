@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from .parser import parse
 from .processor import Preprocessor
 
