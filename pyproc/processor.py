@@ -3,11 +3,12 @@ import sys
 
 from .parser import parse
 
-_USING_PY2__ = sys.version_info[0] == 2
+__PY_VERSION__ = '__PY%s__' % sys.version_info[0]
 _SYS_PLATFORM__ = '__%s__' % sys.platform.upper()
 
 _DEVICE_DATA = {
-    _SYS_PLATFORM__: True
+    _SYS_PLATFORM__: True,
+    __PY_VERSION__: None,
 }
 
 class Preprocessor:
@@ -15,8 +16,6 @@ class Preprocessor:
 
     namespace = {
         '__PYVERSION__': '.'.join(str(_) for _ in sys.version_info[:3]),
-        '__PY2__': _USING_PY2__,
-        '__PY3__': not _USING_PY2__,
         **_DEVICE_DATA,
     }
 
