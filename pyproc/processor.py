@@ -19,7 +19,7 @@ class Preprocessor:
         **_DEVICE_DATA,
     }
 
-    def __init__(self, contents):
+    def __init__(self, contents, *, output=None):
         self.tree = tree = parse(contents)
         self._iter_tree = iter(tree)
 
@@ -27,10 +27,9 @@ class Preprocessor:
 
         self.write_offset = 0
         self.source = contents
-        self.body = io.StringIO()
 
-    def __repr__(self):
-        return '<preprocessor @ %s>' % id(self)
+        self._output = output
+        self.body = io.StringIO()
 
     def __len__(self):
         return len(self.body.getvalue())
@@ -81,3 +80,6 @@ class Preprocessor:
             getattr(self, 'op_%s' % op)(pos, *args)
 
             self.write_offset += end - (start + self.source.index('\n', end))
+
+        if self._output:
+            self._output.write(self.body.getvalue())
