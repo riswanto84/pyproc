@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import argparse
 
@@ -8,13 +10,13 @@ except ImportError:
     import pyproc
 
 def main(args):
+    output_file = args.output_file or '%s_proc.py' % args.file.rsplit('.', 1)[0]
+
     with open(args.file) as inf:
         contents = inf.read()
 
-    output_file = args.output_file or '%s_proc.py' % args.file.rsplit('.', 1)[0]
-
     with open(output_file, 'w') as inf:
-        proc = pyproc.Preprocessor(contents, output=inf)
+        proc = pyproc.Preprocessor(contents, input_file=args.file, output_file=inf)
         proc.process()
 
 if __name__ == '__main__':

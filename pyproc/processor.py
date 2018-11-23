@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import io
 import sys
 
@@ -19,7 +21,7 @@ class Preprocessor:
         **_DEVICE_DATA,
     }
 
-    def __init__(self, contents, *, output=None):
+    def __init__(self, contents, *, input_file, output_file=None):
         self.tree = tree = parse(contents)
         self._iter_tree = iter(tree)
 
@@ -28,7 +30,8 @@ class Preprocessor:
         self.write_offset = 0
         self.source = contents
 
-        self._output = output
+        self._input = input_file
+        self._output = input_file
         self.body = io.StringIO()
 
     def __len__(self):
@@ -70,7 +73,19 @@ class Preprocessor:
             self.block = next(self._iter_tree)
 
     def op_endif(self, pos):
-        pass
+        pass # we should probably be doing some sanity checks here.
+
+    def op_include(self, pos, file):
+        start, end = pos
+        self.write_offset += end - (start + self.source.index('\n', end))
+
+        if file[0] not in ('"', '\''):
+            raise SyntaxError('Include directive must have file argument inside quotes')
+
+        path = self._input.rsplit('/', 1)[0] + '/%s'
+
+        with open(path % file[1:-1]) as inf:
+            self.body.write(inf.read())
 
     def process(self):
         for block in self._iter_tree:
