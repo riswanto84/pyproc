@@ -21,7 +21,17 @@ class Preprocessor:
         **_DEVICE_DATA,
     }
 
-    def __init__(self, contents, *, input_file, output_file=None):
+    def __init__(self, contents: str, *, input_file: str, output_file=None):
+        '''
+        Parameters
+        ----------
+            contents: str
+                The contents of the file the preprocessor should parse.
+            input_file: str
+                The name of the input file (used for the inlude directive).
+            output_file: file-like object
+                The output file to write to.
+        '''
         self.tree = tree = parse(contents)
         self._iter_tree = iter(tree)
 
@@ -37,7 +47,26 @@ class Preprocessor:
     def __len__(self):
         return len(self.body.getvalue())
 
-    def op_define(self, pos, name, value=None):
+    def op_define(self, pos: tuple, name: str, value: str=None):
+        '''
+        handler for the `define` directive.
+
+        usage:
+        ```py
+        ##define _PRESENCE_
+        ##define _MAGIC_ 0x86
+        ```
+
+        Parameters
+        ----------
+        pos: Tuple[int, int]
+            The start and end position of the declaration (not including operands)
+        name: str
+            The label to define
+        value: Optional[str]
+            The value bound to the label
+            The value will automatically be casted to its appropriate type.
+        '''
         cast = lambda v: v
 
         if value is None:
@@ -51,7 +80,26 @@ class Preprocessor:
 
         self.namespace[name] = cast(value)
 
-    def op_ifdef(self, pos, label):
+    def op_ifdef(self, pos: tuple, label: str):
+        '''
+        handler for `ifdef` declaration.
+
+        usage:
+        ```python
+        ##ifdef __LINUX__
+        print('Compiled on linux.')
+        ##else
+        print('Not compiled on linux.')
+        ##endif
+        ```
+
+        Parameters
+        ----------
+        pos: Tuple[int, int]
+            The start and end position of the declaration (not including operands)
+        name: str
+            The label whos presence must be checked.
+        '''
         if label in self.namespace:
 
             start, end = pos
@@ -72,10 +120,33 @@ class Preprocessor:
         while self.block[1] != 'endif':
             self.block = next(self._iter_tree)
 
-    def op_endif(self, pos):
+    def op_endif(self, pos: tuple):
+        '''
+        handler for `endif` directive.
+
+        usage:
+            Anywhere you use a conditional declaration, you must use an endif.
+
+        Currently a NOP.
+        '''
         pass # we should probably be doing some sanity checks here.
 
-    def op_include(self, pos, file):
+    def op_include(self, pos: tuple, file: str):
+        '''
+        handler for `include` directive.
+
+        usage:
+        ```python
+        ##include "some_file.py"
+        ```
+
+        Parameters
+        ----------
+        pos: Tuple[int, int]
+            The start and end position of the declaration (not including operands)
+        file: str
+            The file whos contents must be inlined.
+        '''
         start, end = pos
         self.write_offset += end - (start + self.source.index('\n', end))
 
