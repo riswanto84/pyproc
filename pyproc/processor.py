@@ -41,7 +41,7 @@ class Preprocessor:
         self.source = contents
 
         self._input = input_file
-        self._output = input_file
+        self._output = output_file
         self.body = io.StringIO()
 
     def __len__(self):
