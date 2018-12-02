@@ -10,8 +10,10 @@ except ImportError:
     import pyproc
 
 def main(args):
-    output_file = args.output_file or '%s_proc.py' % args.file.rsplit('.', 1)[0]
 
+    path, _, extension = args.file.rpartition('.')
+
+    output_file = '%s_proc.py' % path
     with open(args.file) as inf:
         contents = inf.read()
 
